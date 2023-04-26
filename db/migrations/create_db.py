@@ -12,7 +12,7 @@ conn.cursor().execute('''
     (   
         id PRIMARY_KEY INTEGER,
         user_id INTEGER,
-        status INTEGER,
+        status INTEGER
     )
 ''')
 
