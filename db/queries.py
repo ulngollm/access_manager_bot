@@ -1,5 +1,5 @@
 import sqlite3
-from access import AccessStatus
+
 
 from dotenv import load_dotenv
 import os
@@ -19,27 +19,18 @@ def check_access(user_id: int):
 def add_user(user_id: int):
     conn = sqlite3.connect(DB_NAME)
     conn.cursor().execute(
-        'INSERT or IGNORE INTO access_rights(user_id, status) VALUES(?,?)',
-        (user_id, AccessStatus.DENIED)
-    )
-    conn.close()
-
-
-def deny_access(user_id: int):
-    conn = sqlite3.connect(DB_NAME)
-    conn.cursor().execute(
-        'UPDATE access_rights SET status = ? where user_id = ?',
-        (AccessStatus.DENIED, user_id,)
+        'INSERT INTO access_rights(user_id) VALUES(?)',
+        (user_id,)
     )
     conn.commit()
     conn.close()
 
 
-def allow_access(user_id: int):
+def set_access(user_id: int, status_id: int):
     conn = sqlite3.connect(DB_NAME)
     conn.cursor().execute(
         'UPDATE access_rights SET status = ? where user_id = ?',
-        (AccessStatus.ALLOWED, user_id,)
+        (status_id, user_id,)
     )
     conn.commit()
     conn.close()

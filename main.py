@@ -3,7 +3,7 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery 
-from access import AccessStatus
+from access import Authorization
 from db import queries
 import os
 import random
@@ -20,10 +20,7 @@ app = Client('bot', API_ID, API_HASH, bot_token=BOT_API_TOKEN)
 
 def check_access(func):
     def wrapper(client, message: Message):
-        user_access_status = queries.check_access(message.from_user.id)[0]
-        if user_access_status == None:
-            queries.add_user(message.from_user.id)
-        if user_access_status != AccessStatus.ALLOWED:
+        if not Authorization.check_access(message.from_user.id):
             notify_access_limit(client, message)
             return
         func(client, message)
@@ -73,7 +70,8 @@ def notify_access_limit(client: Client, message: Message):
 
 def deny_access(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
-    queries.deny_access(user_id)
+    Authorization.deny_access(user_id)
+
     callback_query.answer("Доступ для пользователя %d запрещен" % user_id, show_alert=True)
     notify_reject_user(client, user_id)
 
@@ -86,7 +84,8 @@ def notify_reject_user(client: Client, user_id):
 
 def allow_access(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
-    queries.allow_access(user_id)
+    Authorization.allow_access(user_id)
+
     callback_query.answer("Доступ для пользователя %d разрешен" % user_id, show_alert=True)
     notify_accept_user(client, user_id)
 
