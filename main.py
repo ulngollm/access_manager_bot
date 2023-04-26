@@ -20,7 +20,7 @@ app = Client('bot', API_ID, API_HASH, bot_token=BOT_API_TOKEN)
 
 def check_access(func):
     def wrapper(client, message: Message):
-        user_access_status = queries.check_access(message.from_user.id)
+        user_access_status = queries.check_access(message.from_user.id)[0]
         if user_access_status == None:
             queries.add_user(message.from_user.id)
         if user_access_status != AccessStatus.ALLOWED:
