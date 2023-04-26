@@ -4,15 +4,15 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery 
 import os
-
+import random
 
 load_dotenv()
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')
+ADMIN_LIST = os.getenv('ADMIN_LIST').split(',')
 
 app = Client('bot', API_ID, API_HASH, bot_token=BOT_API_TOKEN)
-admin = 692696840
 access_list = {}
 
 class AccessStatus:
@@ -32,7 +32,7 @@ def check_access(func):
 
 def request_access(client: Client, message: Message):
     client.send_message(
-        admin,
+        random.choice(ADMIN_LIST),
         "Пользователь запрашивает доступ",
         reply_markup=InlineKeyboardMarkup([
             [
@@ -55,16 +55,32 @@ def request_access(client: Client, message: Message):
     )
 
 
+def notify_reject_user(client: Client, user_id):
+    client.send_message(
+        user_id,
+        "Извините, доступ запрещен."
+    )
+
+def notify_accept_user(client: Client, user_id):
+    client.send_message(
+        user_id,
+        "Доступ разрешен."
+    )
+
+
 def deny_access(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
     access_list[user_id] = AccessStatus.DENIED
     callback_query.answer("Доступ для пользователя %d запрещен" % user_id, show_alert=True)
+    notify_reject_user(client, user_id)
 
 
 def allow_access(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
     access_list[user_id] = AccessStatus.ALLOWED
     callback_query.answer("Доступ для пользователя %d разрешен" % user_id, show_alert=True)
+    notify_accept_user(client, user_id)
+
 
 
 @check_access
