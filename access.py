@@ -13,7 +13,7 @@ class Authorization:
         if user_access_status == None:
             queries.add_user(user_id)
             return False
-        return user_access_status[0] != AccessStatus.ALLOWED        
+        return user_access_status[0] == AccessStatus.ALLOWED        
 
 
     def deny_access(user_id):
