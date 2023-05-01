@@ -27,11 +27,11 @@ def request_access(client: Client, callback_query: CallbackQuery):
             [
                 InlineKeyboardButton(
                     "Принять",
-                    callback_data= "accept:%d" % callback_query.from_user.id
+                    callback_data= "accept:user:%d" % callback_query.from_user.id
                 ),
                 InlineKeyboardButton(
                     "Отклонить",
-                    callback_data= "reject:%d" % callback_query.from_user.id
+                    callback_data= "reject:user:%d" % callback_query.from_user.id
                 )
             ]
         ])
@@ -48,7 +48,7 @@ def notify_access_limit(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton(
                 "Пустите меня, пожалуйста",
-                callback_data="request"
+                callback_data="request:user"
             )
         ]])
     )
@@ -93,3 +93,51 @@ def hello(client: Client, message: Message):
     message.reply(
         'Привет!'
     )
+
+
+def request_admin(client: Client, message: Message):
+    message.reply(
+        'Вы хотите стать админом?',
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton(
+                "Да, отправить запрос",
+                callback_data="request:admin"
+            )
+        ]])
+    )
+
+def confirm_admin_request(client: Client, callback_query: CallbackQuery):
+    callback_query.message.reply(
+        'Запрос на получение прав администратора отправлен. Ожидайте ответа в этом чате.'
+    )
+
+    client.send_message(
+        # todo extract to admin service
+        random.choice(ADMIN_LIST),
+        "Пользователь запрашивает администраторский доступ",
+        reply_markup=InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(
+                    "Просмотреть профиль",
+                    user_id=callback_query.from_user.id
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "Принять",
+                    callback_data= "accept:admin:%d" % callback_query.from_user.id
+                ),
+                InlineKeyboardButton(
+                    "Отклонить",
+                    callback_data= "reject:admin:%d" % callback_query.from_user.id
+                )
+            ]
+        ])
+    )
+
+def deny_admin_access(client: Client, callback_query: CallbackQuery):
+    pass
+
+
+def allow_admin_access(client: Client, callback_query: CallbackQuery):
+    pass
