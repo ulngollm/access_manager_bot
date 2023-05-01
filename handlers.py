@@ -1,7 +1,7 @@
 import random
 from pyrogram import Client
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery 
-from access import Authorization
+from pyrogram.types import Message, CallbackQuery 
+from services.access import Authorization
 from commands.request import user as user_request
 from commands.request import admin
 
@@ -22,7 +22,7 @@ def request_access(client: Client, callback_query: CallbackQuery):
     admin.send_request(client, callback_query)
     
 
-def deny_access(client: Client, callback_query: CallbackQuery):
+def deny_user(client: Client, callback_query: CallbackQuery):
     admin.reject_request(client, callback_query)
     user_request.notify_reject(client, callback_query)
 
@@ -56,10 +56,11 @@ def request_admin(client: Client, callback_query: CallbackQuery):
 
 
 def deny_admin_access(client: Client, callback_query: CallbackQuery):
-
+    admin.reject_admin_request(client, callback_query)
     user_request.notify_reject(client, callback_query)
     
 
 def allow_admin_access(client: Client, callback_query: CallbackQuery):
+   admin.accept_admin_request(client, callback_query)
    user_request.notify_success_admin(client, callback_query)
     

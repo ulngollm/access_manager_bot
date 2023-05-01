@@ -1,13 +1,12 @@
 from pyrogram import Client
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery 
-import random
-from app import ADMIN_LIST
-from access import Authorization
+from services.access import Access
+from services.admin import Admin
 
 
 def send_request(client: Client, callback_query: CallbackQuery):
     client.send_message(
-        random.choice(ADMIN_LIST),
+        Admin.choose_admin(),
         "Пользователь запрашивает доступ",
         reply_markup=InlineKeyboardMarkup([
             [
@@ -32,22 +31,19 @@ def send_request(client: Client, callback_query: CallbackQuery):
 
 def accept_request(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
-    Authorization.deny_access(user_id)
-
-    callback_query.answer("Доступ для пользователя %d запрещен" % user_id, show_alert=True)
+    Access.allow_user(user_id)
+    alert_user_acception(callback_query, user_id)
 
 
 def reject_request(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.matches[0].group(1))
-    Authorization.allow_access(user_id)
-
-    callback_query.answer("Доступ для пользователя %d разрешен" % user_id, show_alert=True)
+    Access.deny_user(user_id)
+    alert_user_rejection(callback_query, user_id)
 
 
 def request_admin(client: Client, callback_query: CallbackQuery):
     client.send_message(
-        # todo extract to admin service
-        ADMIN_LIST[0], # только для суперпользователя
+        Admin.choose_superadmin(),
         "Пользователь запрашивает администраторский доступ",
         reply_markup=InlineKeyboardMarkup([
             [
@@ -68,3 +64,23 @@ def request_admin(client: Client, callback_query: CallbackQuery):
             ]
         ])
     )
+
+
+def accept_admin_request(client: Client, callback_query: CallbackQuery):
+    user_id = int(callback_query.matches[0].group(1))
+    Admin.add_admin(user_id)
+    alert_user_acception(callback_query, user_id)
+
+
+def reject_admin_request(client: Client, callback_query: CallbackQuery):
+    user_id = int(callback_query.matches[0].group(1))
+    Admin.delete_admin(user_id)
+    alert_user_rejection(callback_query, user_id)
+
+
+def alert_user_acception(callback_query: CallbackQuery, user):
+    callback_query.answer("Доступ для пользователя %d разрешен" % user, show_alert=True) 
+
+
+def alert_user_rejection(callback_query: CallbackQuery, user):
+    callback_query.answer("Доступ для пользователя %d разрешен" % user, show_alert=True) 

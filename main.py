@@ -10,7 +10,7 @@ client.add_handler(MessageHandler(handlers.confirm_admin_request, filters.comman
 client.add_handler(MessageHandler(handlers.reply_message, filters.text))
 
 client.add_handler(CallbackQueryHandler(handlers.request_access, filters.regex(pattern='request:user')))
-client.add_handler(CallbackQueryHandler(handlers.deny_access, filters.regex(pattern='reject:user:(\d*)')))
+client.add_handler(CallbackQueryHandler(handlers.deny_user, filters.regex(pattern='reject:user:(\d*)')))
 client.add_handler(CallbackQueryHandler(handlers.allow_access, filters.regex(pattern='accept:user:(\d*)')))
 
 client.add_handler(CallbackQueryHandler(handlers.request_admin, filters.regex(pattern='request:admin')))

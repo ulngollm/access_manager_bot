@@ -16,9 +16,11 @@ class Authorization:
         return user_access_status[0] == AccessStatus.ALLOWED        
 
 
-    def deny_access(user_id):
+class Access:
+    def deny_user(user_id):
         queries.set_access(user_id, AccessStatus.DENIED)
 
     
-    def allow_access(user_id):
+    def allow_user(user_id):
         queries.set_access(user_id, AccessStatus.ALLOWED)
+
